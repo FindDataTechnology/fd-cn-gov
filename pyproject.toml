@@ -30,10 +30,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/FindDataOfficial/cn-goverment-datasource"
-Repository = "https://github.com/FindDataOfficial/cn-goverment-datasource"
-Changelog = "https://github.com/FindDataOfficial/cn-goverment-datasource/releases"
-Issues = "https://github.com/FindDataOfficial/cn-goverment-datasource/issues"
+Homepage = "https://github.com/FindDataTechnology/fd-cn-gov"
+Repository = "https://github.com/FindDataTechnology/fd-cn-gov"
+Changelog = "https://github.com/FindDataTechnology/fd-cn-gov/releases"
+Issues = "https://github.com/FindDataTechnology/fd-cn-gov/issues"
 
 [project.scripts]
 fd-cn-gov = "fd_cn_gov.cli:main"
