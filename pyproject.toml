@@ -38,6 +38,9 @@ Issues = "https://github.com/FindDataTechnology/fd-cn-gov/issues"
 [project.scripts]
 fd-cn-gov = "fd_cn_gov.cli:main"
 
+[project.entry-points."fd_open_data_mcp.datasources"]
+fd-cn-gov = "fd_cn_gov.catalog:CATALOG"
+
 [tool.setuptools.dynamic]
 version = { attr = "fd_cn_gov.__version__" }
 

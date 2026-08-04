@@ -2191,5 +2191,106 @@
       "name": "safe_whxw_archive",
       "url": "https://www.safe.gov.cn/safe/whxw/index.html"
     }
+  ],
+  "organizations": [
+    {
+      "code": "MEE",
+      "name_en": "Ministry of Ecology and Environment",
+      "name_zh": "生态环境部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.mee.gov.cn"
+      }
+    },
+    {
+      "code": "MEM",
+      "name_en": "Ministry of Emergency Management",
+      "name_zh": "应急管理部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.mem.gov.cn"
+      }
+    },
+    {
+      "code": "MNR",
+      "name_en": "Ministry of Natural Resources",
+      "name_zh": "自然资源部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.mnr.gov.cn"
+      }
+    },
+    {
+      "code": "MOA",
+      "name_en": "Ministry of Agriculture and Rural Affairs",
+      "name_zh": "农业农村部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.moa.gov.cn"
+      }
+    },
+    {
+      "code": "MOF",
+      "name_en": "Ministry of Finance",
+      "name_zh": "财政部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.mof.gov.cn"
+      }
+    },
+    {
+      "code": "MOFCOM",
+      "name_en": "Ministry of Commerce",
+      "name_zh": "商务部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.mofcom.gov.cn"
+      }
+    },
+    {
+      "code": "MOHURD",
+      "name_en": "Ministry of Housing and Urban-Rural Development",
+      "name_zh": "住房和城乡建设部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.mohurd.gov.cn"
+      }
+    },
+    {
+      "code": "MOT",
+      "name_en": "Ministry of Transport",
+      "name_zh": "交通运输部",
+      "metadata": {
+        "type": "ministry",
+        "url": "https://www.mot.gov.cn"
+      }
+    },
+    {
+      "code": "NDRC",
+      "name_en": "National Development and Reform Commission",
+      "name_zh": "国家发展和改革委员会",
+      "metadata": {
+        "type": "commission",
+        "url": "https://www.ndrc.gov.cn"
+      }
+    },
+    {
+      "code": "PBC",
+      "name_en": "People's Bank of China",
+      "name_zh": "中国人民银行",
+      "metadata": {
+        "type": "central_bank",
+        "url": "https://www.pbc.gov.cn"
+      }
+    },
+    {
+      "code": "SAFE",
+      "name_en": "State Administration of Foreign Exchange",
+      "name_zh": "国家外汇管理局",
+      "metadata": {
+        "type": "administration",
+        "url": "https://www.safe.gov.cn"
+      }
+    }
   ]
 }
