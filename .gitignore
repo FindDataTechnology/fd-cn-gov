@@ -20,8 +20,7 @@ dist/
 .env.*
 !.env.example
 
-# Local databases / crawl outputs
-*.db
+# SQLite sidecars are runtime junk — data .db files ARE tracked intentionally
 *.db-shm
 *.db-wal
 *.db-journal
