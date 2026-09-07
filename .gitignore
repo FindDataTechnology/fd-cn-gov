@@ -14,3 +14,16 @@ dist/
 .trae/
 .vscode/
 .idea/
+
+# Env / secrets — never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Local databases / crawl outputs
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+output/
+*.log
