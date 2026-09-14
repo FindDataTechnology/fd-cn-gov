@@ -20,7 +20,10 @@ dist/
 .env.*
 !.env.example
 
-# SQLite sidecars are runtime junk — data .db files ARE tracked intentionally
+# SQLite databases (runtime artifacts; tracked data .db files re-included below)
+*.db
+*.sqlite3
+!fd_cn_gov/registry/registry.db
 *.db-shm
 *.db-wal
 *.db-journal

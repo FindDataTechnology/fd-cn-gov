@@ -108,6 +108,9 @@ CATALOG = {
         {"column": "date", "concept": "document.publish_date", "entity_type": "organization", "measure": "publication_date", "unit": "date", "frequency": "variable"},
         {"column": "url", "concept": "document.url", "entity_type": "organization", "measure": "document_url", "unit": "url", "frequency": "variable"},
         {"column": "doc_type", "concept": "document.format", "entity_type": "organization", "measure": "format_type", "unit": "categorical", "frequency": "variable"},
+        # Taxonomy concepts for unified classification
+        {"column": "taxonomy_code", "concept": "taxonomy.report_section", "entity_type": "industry", "measure": "report_section_classification", "unit": "string", "frequency": "static"},
+        {"column": "document_type_codes", "concept": "taxonomy.document_type", "entity_type": "organization", "measure": "document_type_classification", "unit": "array", "frequency": "static"},
     ],
     "entities": [
         {"entity_type": "organization", "coverage": "universe"},
