@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/fd-cn-gov.svg)](https://pypi.org/project/fd-cn-gov/)
 [![Python versions](https://img.shields.io/pypi/pyversions/fd-cn-gov.svg)](https://pypi.org/project/fd-cn-gov/)
-[![License: MIT](https://img.shields.io/pypi/l/fd-cn-gov.svg)](https://github.com/FindDataOfficial/cn-goverment-datasource/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/pypi/l/fd-cn-gov.svg)](https://github.com/FindDataTechnology/fd-cn-gov/blob/main/LICENSE)
 
 Scrapers + a self-contained datasource registry for **Chinese central-government ministry open-information archives**. Catalog-crawls the public notice / news / data archives of 11 ministries (MOF, PBC, NDRC, MOFCOM, MOHURD, MOT, MOA, SAFE, MNR, MEE, MEM), emitting one JSON record per listed document, and ships a SQLite + JSON registry describing every datasource and its column schema.
 
@@ -37,7 +37,7 @@ Requires Python ≥3.10. Dependencies: `scrapling` (HTTP + adaptive parsing), `s
 ### From source
 
 ```bash
-pip install git+https://github.com/FindDataOfficial/cn-goverment-datasource.git
+pip install git+https://github.com/FindDataTechnology/fd-cn-gov.git
 ```
 
 ## CLI
