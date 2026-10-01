@@ -1,5 +1,7 @@
 # fd-cn-gov
 
+> **Wire (柏讯) product line** · the open-data supply line of [FindData](https://www.finddatatech.cloud/products/wire) — ministry open-information scrapers
+
 [![PyPI version](https://img.shields.io/pypi/v/fd-cn-gov.svg)](https://pypi.org/project/fd-cn-gov/)
 [![Python versions](https://img.shields.io/pypi/pyversions/fd-cn-gov.svg)](https://pypi.org/project/fd-cn-gov/)
 [![License: MIT](https://img.shields.io/pypi/l/fd-cn-gov.svg)](https://github.com/FindDataTechnology/fd-cn-gov/blob/main/LICENSE)
