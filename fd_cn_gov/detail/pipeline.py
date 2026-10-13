@@ -111,6 +111,10 @@ def build_record(entry: ListEntry, html: str, *, parser: Callable | None = None)
     metadata = {
         "doc_number": doc.doc_number,
         "issuer": doc.issuer,
+        # 归一前的原始机关名：检索用归一后的 issuer（facet 词表可匹配），
+        # 原值留档供追溯（「这条为什么归到其他」要能查回来）。
+        # 用 getattr 兜底：旧版引擎解析器没有该字段，缺它不应让整批抓取失败。
+        "issuer_raw": getattr(doc, "issuer_raw", None),
         "addressee": doc.addressee,
         "doc_type": doc.doc_type,
         "index_no": doc.index_no,
