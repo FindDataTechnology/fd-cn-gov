@@ -22,6 +22,10 @@ WORKDIR /app
 
 COPY . /app/fd-cn-gov
 
+# git：pip 从 git+https 装 fd-text-core 需要它（slim 镜像不含 git）。装完 apt 清缓存。
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+ && rm -rf /var/lib/apt/lists/*
+
 # fd-text-core（正文解析器）：公开仓从 git 装（不 COPY 同级目录 —— 标准 build
 # context 不允许 context 外路径）。scrapling 钉 <0.5（0.5 移除 AsyncDynamicSession，
 # 本仓 detail/browser 依赖它）；sqlalchemy 是 fd-cn-gov 既有依赖；boto3 供上传 S3。
