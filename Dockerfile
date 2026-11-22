@@ -25,11 +25,11 @@ COPY . /app/fd-cn-gov
 # fd-text-core（正文解析器）：公开仓从 git 装（不 COPY 同级目录 —— 标准 build
 # context 不允许 context 外路径）。scrapling 钉 <0.5（0.5 移除 AsyncDynamicSession，
 # 本仓 detail/browser 依赖它）；sqlalchemy 是 fd-cn-gov 既有依赖；boto3 供上传 S3。
-RUN pip install --no-cache-dir ${PIP_INDEX_URL:+-i $PIP_INDEX_URL} \
- && pip install --no-cache-dir ${PIP_INDEX_URL:+-i $PIP_INDEX_URL} \
+RUN if [ -n "$PIP_INDEX_URL" ]; then PIPOPT="-i $PIP_INDEX_URL"; else PIPOPT=""; fi \
+ && pip install --no-cache-dir $PIPOPT \
       "git+https://github.com/FindDataTechnology/fd-text-core@${FDTEXT_GIT_REF}" \
- && pip install --no-cache-dir ${PIP_INDEX_URL:+-i $PIP_INDEX_URL} -e /app/fd-cn-gov \
- && pip install --no-cache-dir ${PIP_INDEX_URL:+-i $PIP_INDEX_URL} 'scrapling[fetchers]>=0.4,<0.5' boto3
+ && pip install --no-cache-dir $PIPOPT -e /app/fd-cn-gov \
+ && pip install --no-cache-dir $PIPOPT 'scrapling[fetchers]>=0.4,<0.5' boto3
 
 RUN useradd -m -u 1000 appuser && chown -R appuser /app
 USER appuser
