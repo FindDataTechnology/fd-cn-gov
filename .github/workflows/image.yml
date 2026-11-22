@@ -1,0 +1,43 @@
+# Container image publish — GitHub Actions -> Tencent TCR。
+# fd-cn-gov 单镜像：gov.cn 政策库采集（全量 Job / 每日增量 CronJob 共用）。
+# 通道：公开仓直出（本源仓已公开，标准 runner 免费无限）。
+name: image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Dockerfile"
+      - "fd_cn_gov/**"
+      - ".github/workflows/image.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install + test
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]" 2>/dev/null || pip install -e .
+          pip install pytest
+          python -m pytest tests/ -q
+
+  fd-cn-gov:
+    needs: test
+    uses: FindDataTechnology/fd-ci/.github/workflows/image-build.yml@main
+    secrets: inherit
+    with:
+      image: fd-cn-gov
+      namespace: finddata
