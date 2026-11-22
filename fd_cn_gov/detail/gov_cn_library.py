@@ -38,9 +38,51 @@ from typing import Iterator
 from urllib.parse import urlencode
 
 from .fetch import FetchPolicy, fetch_detail
-from .pipeline import DetailRecord, build_record, looks_binary
+from .pipeline import DetailRecord, build_record
+
+def looks_binary(text: str) -> bool:
+    """正文是否 PDF/二进制（不可入库的自然语言文本）。
+
+    内联自包含（不依赖 pipeline.looks_binary —— 那可能是分支上的在途改动，干净 clone
+    里未必有；本采集器自足）。判据：%PDF 头，或大量 U+FFFD/控制字符（解码损坏 = 二进制）。
+    """
+    if not text:
+        return False
+    if text.lstrip()[:1024].startswith("%PDF"):
+        return True
+    sample = text[:2048]
+    bad = sum(1 for ch in sample if ch == "�" or ord(ch) < 9 or (13 < ord(ch) < 32))
+    return bad / len(sample) > 0.05
 from .sources import ListEntry, normalize_url
-from .storage import LocalSink, manifest_key, run_id_utc, structured_part_key
+from .storage import manifest_key, run_id_utc, structured_part_key
+
+
+class LocalSink:
+    """s3 客户端最小替身：把对象写进本地目录（无对象存储凭据时）。
+
+    内联自包含（不依赖 storage.LocalSink —— 那可能是分支上的在途改动，干净 clone
+    里未必有）。目录布局与桶内同构：`<root>/<Bucket>/<Key>`，本地产物可直接上传 S3。
+    """
+
+    def __init__(self, root: str):
+        self.root = root
+
+    def _path(self, bucket: str, key: str) -> str:
+        import os
+        return os.path.join(self.root, bucket, key)
+
+    def put_object(self, Bucket: str, Key: str, Body: bytes, **_ignored) -> dict:
+        import os
+        path = self._path(Bucket, Key)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as fh:
+            fh.write(Body)
+        return {"ETag": ""}
+
+    def get_object(self, Bucket: str, Key: str) -> dict:
+        from io import BytesIO
+        with open(self._path(Bucket, Key), "rb") as fh:
+            return {"Body": BytesIO(fh.read())}
 
 API_URL = "https://sousuo.www.gov.cn/search-gov/data"
 
