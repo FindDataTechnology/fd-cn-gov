@@ -54,6 +54,9 @@ class FetchPolicy:
     max_attempts: int = 3
     backoff: float = 1.5  # 退避基数：第 n 次重试前等 backoff**n 秒
     user_agent: str = USER_AGENT
+    # None=交给 scrapling 默认（可能读环境代理）；{} 或 {"http":"","https":""}=强制直连。
+    # 本机 macOS 系统代理会劫持回环/外网请求，采集器需要显式关掉时传空 dict。
+    proxies: dict | None = None
     _last_at: float = field(default=0.0, repr=False)
 
     def wait_turn(self) -> None:
@@ -87,12 +90,16 @@ def fetch_detail(url: str, policy: FetchPolicy | None = None, *, fetcher=None) -
             time.sleep(pol.backoff ** attempt)
         pol.wait_turn()
         try:
+            kwargs = {}
+            if pol.proxies is not None:
+                kwargs["proxies"] = pol.proxies
             resp = fetcher.get(
                 url,
                 follow_redirects=True,
                 headers={"User-Agent": pol.user_agent},
                 stealthy_headers=False,
                 timeout=pol.timeout,
+                **kwargs,
             )
         except Exception as exc:  # 网络层异常（超时/连接重置/TLS）
             last_error = f"{type(exc).__name__}: {exc}"
@@ -100,9 +107,18 @@ def fetch_detail(url: str, policy: FetchPolicy | None = None, *, fetcher=None) -
             continue
 
         status = int(getattr(resp, "status", 0) or 0)
-        body = getattr(resp, "html_content", None) or ""
-        if isinstance(body, bytes):
-            body = body.decode("utf-8", "replace")
+        # 优先用完整原始 body：scrapling 0.4.x 的 html_content 是 lxml 重序列化，
+        # 对 www.gov.cn 政策库详情页会系统性截断成页头（实测 91KB -> 6.5KB，正文全丢，
+        # 而 HTTP 200 无任何报错）。resp.body 是完整字节，才是可解析的源。无 body 属性
+        # 的响应（测试替身/旧版）回退 html_content。
+        raw = getattr(resp, "body", None)
+        if raw:
+            enc = getattr(resp, "encoding", None) or "utf-8"
+            body = raw.decode(enc, "replace") if isinstance(raw, bytes) else str(raw)
+        else:
+            body = getattr(resp, "html_content", None) or ""
+            if isinstance(body, bytes):
+                body = body.decode("utf-8", "replace")
         res.status = status
         res.final_url = str(getattr(resp, "url", "") or url)
 
