@@ -79,6 +79,51 @@ def run_id_utc(when: datetime | None = None) -> str:
     return (when or datetime.now(timezone.utc)).strftime("%Y%m%d%H%M%S")
 
 
+def local_path(root: str, key: str) -> str:
+    """对象键 -> 本地路径（兼容本地落盘；键布局与桶内完全同构，可直接上传）。
+
+    键里没有 `..` 段（键由本模块构造），但仍显式拒绝越界，避免调用方传入的
+    可控键把写入引到根目录之外。
+    """
+    from os.path import normpath, join
+
+    path = normpath(join(root, *key.split("/")))
+    if not path.startswith(normpath(root)):
+        raise ValueError(f"非法对象键（越界）: {key!r}")
+    return path
+
+
+class LocalSink:
+    """`s3` 客户端的最小替身：把对象写进本地目录（无对象存储凭据时的降级路径）。
+
+    只实现管线用到的两个方法，签名与 boto3 对齐（Bucket/Key/Body/ContentType）。
+    目录布局与桶内**完全同构**（`<root>/<Bucket>/<Key>`），故本地产物可直接
+    同步到 `<bucket>/<domain>/structured/` 供引擎摄取，无需任何转换。
+    """
+
+    def __init__(self, root: str):
+        self.root = root
+
+    def _path(self, bucket: str, key: str) -> str:
+        return local_path(self.root, f"{bucket}/{key}")
+
+    def put_object(self, Bucket: str, Key: str, Body: bytes, **_ignored) -> dict:
+        from os import makedirs
+        from os.path import dirname
+
+        path = self._path(Bucket, Key)
+        makedirs(dirname(path), exist_ok=True)
+        with open(path, "wb") as fh:
+            fh.write(Body)
+        return {"ETag": ""}
+
+    def get_object(self, Bucket: str, Key: str) -> dict:
+        from io import BytesIO
+
+        with open(self._path(Bucket, Key), "rb") as fh:
+            return {"Body": BytesIO(fh.read())}
+
+
 def root_summary(domain: str = ROOT) -> dict:
     return {
         "root": domain_prefix(domain),

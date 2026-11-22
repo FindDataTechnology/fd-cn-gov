@@ -1,7 +1,7 @@
 # datasource-provider Specification
 
 ## Purpose
-TBD - created by archiving change datasource-provider-contract. Update Purpose after archive.
+The provider contract `fd-cn-gov` exposes to the DaaS host: a `run(command, params)` dispatch over the CATALOG derived from each scraper's MANIFEST.
 
 ## Requirements
 

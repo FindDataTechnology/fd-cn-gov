@@ -22,7 +22,7 @@ from typing import Any
 
 from .pipeline import ParserUnavailable, run_detail_crawl
 from .sources import SOURCE_BY_SCRIPT, load_list_products
-from .storage import root_summary
+from .storage import LocalSink, root_summary
 
 
 def _run_list_script(script: str, max_pages: int | None, all_pages: bool) -> str:
@@ -99,7 +99,11 @@ def cmd_crawl(args: argparse.Namespace) -> int:
               file=sys.stderr)
         return 0
 
-    s3, bucket = _make_s3()
+    if args.local_dir:
+        # 无对象存储凭据时的降级路径：键布局与桶内同构，产物可直接同步上传。
+        s3, bucket = LocalSink(args.local_dir), os.environ.get("FDTEXT_S3_BUCKET", "fd-text").strip()
+    else:
+        s3, bucket = _make_s3()
     state_raw = _load_state(s3, bucket, args.domain)
     try:
         stats = run_detail_crawl(
@@ -148,6 +152,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_crawl.add_argument("--mode", choices=("incremental", "full"), default="incremental",
                          help="incremental=按哈希水位跳过未变；full=全部重抓")
     p_crawl.add_argument("--dry-run", action="store_true", help="不抓取、不落盘，只打印键布局")
+    p_crawl.add_argument("--local-dir", default=None,
+                         help="写本地目录而非对象存储（需 boto3 与 S3 凭据时的替代；键布局与桶内同构）")
     p_crawl.set_defaults(func=cmd_crawl)
     return ap
 

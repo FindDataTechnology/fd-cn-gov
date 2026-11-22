@@ -297,6 +297,30 @@ def test_pipeline_writes_manifest_before_state():
     assert order.index([k for k in order if "manifest" in k][0]) < order.index("gov/state.json")
 
 
+def test_binary_content_rejected_not_written():
+    """PDF/二进制正文必须拒收并计失败，绝不写进语料（实测 mot 44/270 条 PDF 直链）。"""
+    def _pdf_parser(html):
+        d = _fake_parser(html)
+        d.body = "%PDF-1.7\n%\xe2\xe3\xcf\xd3\n1 0 obj\n<<>> stream\n\x01\x02\x03 endobj"
+        return d
+
+    s3 = _FakeS3()
+    stats = PL.run_detail_crawl([_entry(1)], s3=s3, bucket="b", policy=_policy(),
+                                fetcher=_FakeFetcher([_Resp(200, "<x>")]),
+                                parser=_pdf_parser, log=lambda *a: None)
+    assert stats.written == 0 and stats.parse_failed == 1
+    assert stats.failures[0]["stage"] == "binary"
+    part = [k for k in s3.objects if "structured" in k]
+    assert not part, "二进制正文不应产生任何分片"
+
+
+def test_looks_binary_distinguishes_text_and_pdf():
+    assert PL.looks_binary("%PDF-1.7\n...")
+    assert PL.looks_binary("���\x01\x02\x03" * 100)
+    assert not PL.looks_binary("应急管理部关于印发《办法》的通知\n各有关单位：\n")
+
+
+
 def test_pipeline_incremental_skips_unchanged_on_second_run():
     s3 = _FakeS3()
     entries = [_entry(1)]

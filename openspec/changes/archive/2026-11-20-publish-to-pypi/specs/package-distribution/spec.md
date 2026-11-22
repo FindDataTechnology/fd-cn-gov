@@ -5,23 +5,23 @@ The project SHALL be buildable into both an sdist (`*.tar.gz`) and a wheel (`*.w
 
 #### Scenario: Clean checkout produces both distributions
 - **WHEN** a contributor runs `python -m build` on a fresh clone with build tooling installed
-- **THEN** both `dist/gov_scraw-<version>-py3-none-any.whl` and `dist/gov_scraw-<version>.tar.gz` are produced
+- **THEN** both `dist/fd_cn_gov-<version>-py3-none-any.whl` and `dist/fd_cn_gov-<version>.tar.gz` are produced
 - **AND** no `version` field is present in the `[project]` table of `pyproject.toml` (it is dynamic)
 
 ### Requirement: Bundled registry data ships in the wheel
-The wheel SHALL include `gov_scraw/registry/registry.db` and `gov_scraw/registry/registry.json` so that `import gov_scraw` and the `gov-scraw` CLI function without rebuilding the registry.
+The wheel SHALL include `fd_cn_gov/registry/registry.db` and `fd_cn_gov/registry/registry.json` so that `import fd_cn_gov` and the `fd-cn-gov` CLI function without rebuilding the registry.
 
 #### Scenario: Wheel is self-contained
 - **WHEN** the built wheel is installed into a fresh virtual environment
-- **THEN** `python -c "import gov_scraw; assert len(gov_scraw.list_sources()) == 11"` exits 0
-- **AND** `gov-scraw list` prints the 11 registered sources
+- **THEN** `python -c "import fd_cn_gov; assert len(fd_cn_gov.list_sources()) == 11"` exits 0
+- **AND** `fd-cn-gov list` prints the 11 registered sources
 
 ### Requirement: Single source of truth for version
-The distribution version SHALL be derived from `gov_scraw.__version__` via `[tool.setuptools.dynamic]`, so the wheel metadata and the installed package cannot drift.
+The distribution version SHALL be derived from `fd_cn_gov.__version__` via `[tool.setuptools.dynamic]`, so the wheel metadata and the installed package cannot drift.
 
 #### Scenario: Wheel metadata matches package version
 - **WHEN** the built wheel's metadata is inspected
-- **THEN** the `Version` field equals `gov_scraw.__version__`
+- **THEN** the `Version` field equals `fd_cn_gov.__version__`
 
 ### Requirement: Distribution metadata is PyPI-ready
 The distribution metadata SHALL include project URLs (Homepage, Repository, Changelog), an SPDX license identifier, and Trove classifiers matching the supported Python version (`>=3.10`) and license (MIT). The built distributions SHALL pass `twine check` with no errors or warnings.
@@ -36,7 +36,7 @@ A git tag matching `v*` SHALL trigger a GitHub Actions release workflow that bui
 #### Scenario: Tag push publishes to PyPI
 - **WHEN** a tag `v0.1.0` is pushed to the default branch
 - **THEN** the release workflow builds sdist + wheel
-- **AND** runs `twine check` and a wheel smoke test (`gov-scraw list`)
+- **AND** runs `twine check` and a wheel smoke test (`fd-cn-gov list`)
 - **AND** uploads to PyPI using the `pypi` trusted-publishing environment with `permissions: id-token: write`
 - **AND** no `PYPI_API_TOKEN` (or equivalent) secret is referenced by the workflow
 
@@ -53,10 +53,10 @@ Every pull request and push to `main` SHALL trigger a build-validation workflow 
 - **AND** does not upload to any package index
 
 ### Requirement: Post-publish installability from PyPI
-After a version is published, `pip install gov-scraw==<version>` SHALL succeed in a clean environment and expose a working `gov-scraw` CLI with the bundled registry.
+After a version is published, `pip install fd-cn-gov==<version>` SHALL succeed in a clean environment and expose a working `fd-cn-gov` CLI with the bundled registry.
 
 #### Scenario: Fresh install from PyPI
-- **WHEN** a user runs `pip install gov-scraw==0.1.0` in a new virtual environment with Python >=3.10
+- **WHEN** a user runs `pip install fd-cn-gov==0.1.0` in a new virtual environment with Python >=3.10
 - **THEN** the install succeeds
-- **AND** `gov-scraw --help` exits 0
-- **AND** `gov-scraw list` prints the 11 registered sources
+- **AND** `fd-cn-gov --help` exits 0
+- **AND** `fd-cn-gov list` prints the 11 registered sources

@@ -51,6 +51,24 @@ class ParserUnavailable(RuntimeError):
     """引擎垂域解析器不可用（未安装 fd-text-core）。"""
 
 
+def looks_binary(text: str) -> bool:
+    """正文是否为 PDF/二进制（而非可入库的自然语言文本）。
+
+    实测 mot 数据源有 44/270 条直链 .pdf：抓取层按 utf-8 replace 解码后，正文就是
+    `%PDF-1.7 …stream…endobj` 这类原始字节，混进语料会污染嵌入与检索。此处如实
+    拒收并记为失败（诚实优于塞垃圾）——PDF 文本抽取是独立能力，未在本次范围内。
+    """
+    if not text:
+        return False
+    head = text.lstrip()[:1024]
+    if head.startswith("%PDF"):
+        return True
+    # 解码损坏后大量 U+FFFD 替换符 / 控制字符 = 二进制而非文本
+    sample = text[:2048]
+    bad = sum(1 for ch in sample if ch == "�" or (ord(ch) < 9) or (13 < ord(ch) < 32))
+    return bad / len(sample) > 0.05
+
+
 def load_parser() -> Callable[[str], Any]:
     """取引擎的公文垂域解析器。
 
@@ -227,6 +245,16 @@ def run_detail_crawl(
                 {"source": entry.source, "url": entry.url, "stage": "empty", "reason": "正文为空"}
             )
             log(f"[fail/empty] 正文为空 {entry.url}")
+            continue
+
+        if looks_binary(rec.content):
+            # PDF/二进制直链：正文不是可入库文本，拒收并留痕（不塞垃圾进语料）
+            stats.parse_failed += 1
+            remember_failure(state, entry.source_id, "正文是 PDF/二进制（非文本，未抽取）", kind="binary")
+            stats.failures.append(
+                {"source": entry.source, "url": entry.url, "stage": "binary", "reason": "PDF/二进制正文"}
+            )
+            log(f"[fail/binary] PDF/二进制正文 {entry.url}")
             continue
 
         records.append(rec)
